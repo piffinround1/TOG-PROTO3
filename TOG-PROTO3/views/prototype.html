@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Prototype</title>
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+
+<script src="js/ui/jquery.ui.core.js"></script>
+<script src="js/ui/jquery.ui.widget.js"></script>
+<script src="js/ui/jquery.ui.mouse.js"></script>
+<script src="js/ui/jquery.ui.draggable.js"></script>
+<script src="js/ui/jquery.ui.position.js"></script>
+<script src="js/ui/jquery.ui.resizable.js"></script>
+<script src="js/ui/jquery.ui.sortable.js"></script>
+<script src="js/ui/jquery.ui.droppable.js"></script>
+
+<script  src="js/spine.js"></script>
+<script  src="js/turbulenzengine.js"></script>
+<script  src="js/graphicsdevice.js"></script>
+<script  src="js/draw2d.js"></script>
+<script  src="js/SpriteBatch.js"></script>
+
+
+<script  src="js/input.js"></script>
+<script  src="js/resources.js"></script>
+<script  src="js/TOG.js"></script>
+<script  src="js/TOGUtils.js"></script>
+<script  src="js/TOGUI.js"></script>
+
+<script  src="js/sprite.js"></script>
+<script  src="js/client_engine.js"></script>
+<link rel="stylesheet" type="text/css" href="layout.css">
+
+
+</head>
+<body>
+
+<div class='portholder'><canvas id='viewport'></canvas>
+</div>
+<div class='clear'></div>
+
+</body>
+
+
+<script type="text/javascript">
+
+var canvasForCreate = document.getElementById('viewport');
+
+
+
+var TurbulenzEngine = WebGLTurbulenzEngine.create({canvas: canvasForCreate});
+var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
+var draw2D = Draw2D.create({graphicsDevice: graphicsDevice});	
+
+
+
+
+
+
+var client = {};
+var config = {draw_ghost:false,
+			  do_net_correction:false};
+
+
+init();
+
+//characterSelect();
+function init(){
+	
+	if(draw2D && graphicsDevice && TurbulenzEngine)
+		getClientPlayerCredentials();
+	
+}
+
+function characterSelect(){
+	
+}
+
+
+function getClientPlayerCredentials(){
+	
+	//disable this first
+	//jQuery.get('/TOG-1-0/LoginServlet',createClientPlayer);
+
+	//create plane where character is residing
+	//do server connection... this is what is expected from serverside
+	var posTemp = [];
+	posTemp[0] = 0;
+	posTemp[1] = 0;
+	
+	
+	
+	var clientPlayerTemp = {pos: posTemp, 
+							speed : 600, 
+							playerID : 'test1', 
+							planeID : 'planeID1', 
+							serverSequence: 0, 
+							cof_rest: -0.1, 
+							sprite_map: 'side1',
+							pan_speed : 0.5,
+							jump_strength: 20000,
+							mass: 70
+	};
+	var view_pan_temp = {x:0,y:0};
+	
+	var plane = {
+		clientPlayer: clientPlayerTemp,
+		planeID : 'planeID1',
+		cofK : 0.6,
+		cofS : 0.8,
+		gravity : 9.81,
+		width : 2667,
+		height: 1000,
+		//starting coordinate to draw bg from
+		view_pan:view_pan_temp,
+		
+		
+	};
+	createClientPlayer(plane);
+}
+
+function createClientPlayer(plane){
+	
+	
+	var clientPlayer = plane.clientPlayer;
+	var playerPos = clientPlayer.pos;
+	var cpPos = {x:playerPos[0],y:playerPos[1]};
+	
+	
+	var sprite_map = clientPlayer.sprite_map;
+	
+	
+	
+	//hardcode for now
+	var inventory = [
+	                 
+	                 new TOG.Inventory('Knight left foot armor','knightbodyparts/Basic-character_0013_left-foot2',TOG.ArmorSlotType.leftFoot),
+	                 new TOG.Inventory('Knight right arm armor','knightbodyparts/Basic-character_0001_right-arm2',TOG.ArmorSlotType.rightArm),
+	                 new TOG.Inventory('Knight right shoulder armor','knightbodyparts/Basic-character_0002_right-shoukder2',TOG.ArmorSlotType.rightShoulder),
+	                 new TOG.Inventory('Knight body armor','knightbodyparts/Basic-character_0003_body2',TOG.ArmorSlotType.body),
+	                 new TOG.Inventory('Knight left arm armor','knightbodyparts/Basic-character_0004_left-arm2',TOG.ArmorSlotType.leftArm),
+	                 new TOG.Inventory('Knight left shoulder armor','knightbodyparts/Basic-character_0005_left-shoukder2-',TOG.ArmorSlotType.leftShoulder),
+	                
+	                 new TOG.Inventory('Knight neck armor','knightbodyparts/Basic-character_0006_neck2',TOG.ArmorSlotType.neck),
+	                 new TOG.Inventory('Knight right leg armor','knightbodyparts/Basic-character_0007_right-leg2',TOG.ArmorSlotType.rightLeg),
+	                 new TOG.Inventory('Knight pelvis armor','knightbodyparts/Basic-character_0008_pelvis2',TOG.ArmorSlotType.pelvis),
+	                 new TOG.Inventory('Knight left leg armor','knightbodyparts/Basic-character_0009_left-leg2',TOG.ArmorSlotType.leftLeg),
+	                 new TOG.Inventory('Knight right thigh armor','knightbodyparts/Basic-character_0010_rignt-thigh2',TOG.ArmorSlotType.rightThigh),
+	                 new TOG.Inventory('Knight left thigh armor','knightbodyparts/Basic-character_0011_left-thigh2-',TOG.ArmorSlotType.leftThigh),
+	                 new TOG.Inventory('Knight right foot armor','knightbodyparts/Basic-character_0012_right-foot2',TOG.ArmorSlotType.rightFoot)
+	                 
+	                 ];
+	//hardcode for now
+	var armorSlots = [
+	                  
+	                  new TOG.ArmorSlot('Basic-character_0013_left-foot2',TOG.ArmorSlotType.leftFoot),
+	                  new TOG.ArmorSlot('Basic-character_0009_left-leg2',TOG.ArmorSlotType.leftLeg),
+	                  new TOG.ArmorSlot('Basic-character_0011_left-thigh2-',TOG.ArmorSlotType.leftThigh),
+	                  
+	                  new TOG.ArmorSlot('Basic-character_0004_left-arm2',TOG.ArmorSlotType.leftArm),
+	                  new TOG.ArmorSlot('Basic-character_0005_left-shoukder2-',TOG.ArmorSlotType.leftShoulder),
+	                 
+	                 
+	                  new TOG.ArmorSlot('Basic-character_0008_pelvis2',TOG.ArmorSlotType.pelvis),
+	                  new TOG.ArmorSlot('Basic-character_0026_head',TOG.ArmorSlotType.head),
+	                  
+	                  new TOG.ArmorSlot('Basic-character_0006_neck2',TOG.ArmorSlotType.neck),
+	                  new TOG.ArmorSlot('Basic-character_0003_body22',TOG.ArmorSlotType.body),
+	                  
+	                  new TOG.ArmorSlot('Basic-character_0002_right-shoukder2',TOG.ArmorSlotType.rightShoulder),
+	                  new TOG.ArmorSlot('Basic-character_0001_right-arm2',TOG.ArmorSlotType.rightArm),
+	                  
+	                  new TOG.ArmorSlot('Basic-character_0007_right-leg2',TOG.ArmorSlotType.rightLeg),
+	                  new TOG.ArmorSlot('Basic-character_0010_rignt-thigh2',TOG.ArmorSlotType.rightThigh),
+	                  new TOG.ArmorSlot('Basic-character_0012_right-foot2',TOG.ArmorSlotType.rightFoot)
+	                  
+	                  
+	                  ];
+	
+	
+	
+	var cp = new game_player(cpPos,clientPlayer.speed,clientPlayer.playerID,'walk',false,clientPlayer.planeID,
+			clientPlayer.serverSequence,clientPlayer.mass,null,null,sprite_map,clientPlayer.jump_strength,clientPlayer.cof_rest,inventory,armorSlots);
+	
+	startClient(cp,plane);
+}
+
+function startClient(clientPlayer,plane){
+	
+	//var viewport = document.getElementById('viewport');
+	var state = document.getElementById('stateDiv');
+	canvasForCreate.width = 1500;
+	canvasForCreate.height = 1000;
+	
+	
+	var ctx = graphicsDevice.gl;
+	
+	
+	var client = new client_engine(canvasForCreate,clientPlayer,[],state,plane,ctx);
+	client.update(new Date().getTime());
+	
+	
+	activateControls();
+}
+
+function activateControls(){
+	jQuery('#show_ghosts').change(function(){
+		if(jQuery(this).is(':checked')){
+			config.draw_ghost = true;	
+		}else{
+			config.draw_ghost = false;
+		}
+		
+		client.manipulate_config(config);
+	});
+	
+	
+	jQuery('#net_correction').change(function(){
+		if(jQuery(this).is(':checked')){
+			config.do_net_correction = true;	
+		}else{
+			config.do_net_correction = false;
+		}
+		
+		client.manipulate_config(config);
+	});
+}
+
+
+</script>
+
+
+
+</html>
