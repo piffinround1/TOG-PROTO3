@@ -49,6 +49,8 @@ var client_engine = function(viewport,clientPlayer,players,stateDiv,plane,ctx){
 		this.viewport = viewport;
 		
 		
+		
+		
 		this.ctx = ctx;
 		this.clientPlayer = clientPlayer;
 		this.plane = plane;
@@ -73,6 +75,9 @@ var client_engine = function(viewport,clientPlayer,players,stateDiv,plane,ctx){
 	    //UI
 	    
 	    
+	    //objects that will be simulated by client physics
+		this.newtonian_objects = [this.clientPlayer];
+	    
 	    this.ui_config();
 	    
 		
@@ -84,8 +89,7 @@ var client_engine = function(viewport,clientPlayer,players,stateDiv,plane,ctx){
 		
 		this.create_physics_loop();
 		
-		//objects that will be simulated by client physics
-		this.newtonian_objects = [this.clientPlayer];
+	
 		
 		
 		
@@ -405,14 +409,10 @@ client_engine.prototype.update_physics = function(){
 	
 		this.clientPlayer.old_pos_state = this.pos(this.clientPlayer.cur_pos_state);
 		var nd = this.process_input(this.clientPlayer);
-		//this.clientPlayer.cur_pos_state = this.v_add(this.clientPlayer.old_pos_state,nd);
 		this.clientPlayer.force = nd;
-		
-		
-		//this.clientPlayer.state_time = this.local_time;
-		 //check game rules
-		this.checkGameRules(this.newtonian_objects);
-	//	jQuery('.nd_value').html('client velocity x:'+this.clientPlayer.velocity.x+' y:'+this.clientPlayer.velocity.y);
+	
+		//tick physics engine
+		this.physics.tick_physics();
 		
 };
 
@@ -424,35 +424,6 @@ client_engine.prototype.create_physics_loop = function(){
     }.bind(this), 15);
 };
 
-
-client_engine.prototype.physics_movement_vector_from_direction = function(x,y,player) {
-
-    //Must be fixed step, at physics sync speed.
-	
-	/*calculate max force based on player.speed*/
-	var maxForce = (player.speed * this.fixedStep) * player.mass;
-	
-	var xForce = Math.abs(x) > 0 ? maxForce : 0;
-	var yForce = 0;
-	xForce = x < 0 ? xForce *-1: xForce;
-	
-	
-	//for jumping
-	if(player.feet_sensor){
-		
-		yForce = y < 0 ? player.jump_strength *-1: yForce;
-		
-	}
-	
-	return {
-		//x : (x * (player.speed * this.fixedStep)).fixed(3),
-		//y : (y * (player.speed * this.fixedStep)).fixed(3)
-		x: xForce,
-		y: yForce
-	
-	};
-
-};
 
 
 client_engine.prototype.process_input = function( player ) {
@@ -493,7 +464,7 @@ client_engine.prototype.process_input = function( player ) {
     } //if we have inputs
     
         //we have a direction vector now, so apply the same physics as the client
-    var resulting_vector = this.physics_movement_vector_from_direction(x_dir,y_dir,player);
+    var resulting_vector = this.physics.physics_movement_vector_from_direction(x_dir,y_dir,player);
     if(player.inputs.length) {
         //we can now clear the array since these have been processed
     	
@@ -801,6 +772,19 @@ client_engine.prototype.create_config = function(){
   
     this.pan_speed = 30;
    
+    
+    this.bounds = {
+    	gravity:this.gravity,
+    	cofK:this.cofK,
+    	cofS:this.cofS,
+    	world:{height : this.plane.height, width : this.plane.width},
+    	fixedStep: this.fixedStep
+    
+    };
+    
+    
+    this.physics = new physics(this.newtonian_objects,this.bounds);
+    
     //setup on mouse over event
 	
 	
@@ -1246,8 +1230,6 @@ client_engine.prototype.checkGravity = function(object,force){
 
 client_engine.prototype.checkFriction= function(object,force){
 	//add friction
-	
-	
 	var nForce = object.mass * this.gravity;
 	
 	var fNet = 0;
@@ -1317,9 +1299,6 @@ client_engine.prototype.checkBounds = function(object,force){
 	//reduce velocity x(temporary solution)
 	//var cof = 0.03;
 	//object.velocity.x *=cof;
-
-	
-
 
 };
 

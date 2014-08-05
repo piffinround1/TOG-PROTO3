@@ -7,18 +7,11 @@ function startTOG(){
 
 	console.log('initialize TOG-PROTO3...');
 	
-	app.get('/', function(req, res){
-		  res.sendfile('./views/proto3.html');
-		  
-		  
-	
-	
+	app.get('/proto', function(req, res){
+		res.sendfile('./views/prototype.html');
 	});
 
-	
-	
-	
-	 app.get( '/*' , function( req, res, next ) {
+	app.get( '/*' , function( req, res, next ) {
 
          //This is the current file they have requested
 	     var file = req.params[0];
@@ -30,8 +23,6 @@ function startTOG(){
 	     res.sendfile( '/' + file ,{root:'./views'});
 
 	 }); //app.get *
-	
-	
 	
 	
 	http.listen(3020, function(){

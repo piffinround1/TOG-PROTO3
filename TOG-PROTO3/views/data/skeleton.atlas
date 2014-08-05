@@ -1,0 +1,96 @@
+
+skeleton.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+LOGO_0001_left-arm2-
+  rotate: true
+  xy: 274, 19
+  size: 24, 74
+  orig: 24, 74
+  offset: 0, 0
+  index: -1
+LOGO_0002_right-arm2
+  rotate: true
+  xy: 406, 57
+  size: 24, 74
+  orig: 24, 74
+  offset: 0, 0
+  index: -1
+LOGO_0003_left-shoukder2-
+  rotate: true
+  xy: 200, 13
+  size: 31, 72
+  orig: 31, 72
+  offset: 0, 0
+  index: -1
+LOGO_0004_right-shoukder2
+  rotate: true
+  xy: 125, 4
+  size: 33, 73
+  orig: 33, 73
+  offset: 0, 0
+  index: -1
+LOGO_0005_body2
+  rotate: true
+  xy: 190, 46
+  size: 72, 93
+  orig: 72, 93
+  offset: 0, 0
+  index: -1
+LOGO_0006_neck2
+  rotate: false
+  xy: 406, 17
+  size: 46, 38
+  orig: 46, 38
+  offset: 0, 0
+  index: -1
+LOGO_0007_pelvis2
+  rotate: true
+  xy: 2, 39
+  size: 79, 186
+  orig: 79, 186
+  offset: 0, 0
+  index: -1
+LOGO_0008_left-leg2-
+  rotate: true
+  xy: 2, 2
+  size: 35, 121
+  orig: 35, 121
+  offset: 0, 0
+  index: -1
+LOGO_0009_right-leg2
+  rotate: true
+  xy: 285, 85
+  size: 33, 119
+  orig: 33, 119
+  offset: 0, 0
+  index: -1
+LOGO_0010_left-thigh2--
+  rotate: true
+  xy: 406, 83
+  size: 35, 88
+  orig: 35, 88
+  offset: 0, 0
+  index: -1
+LOGO_0011_rignt-thigh2-
+  rotate: true
+  xy: 285, 45
+  size: 38, 88
+  orig: 38, 88
+  offset: 0, 0
+  index: -1
+LOGO_0012_left-foot2-
+  rotate: false
+  xy: 375, 40
+  size: 29, 43
+  orig: 29, 43
+  offset: 0, 0
+  index: -1
+LOGO_0013_right-foot2
+  rotate: false
+  xy: 454, 12
+  size: 29, 43
+  orig: 29, 43
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,194 @@
+
+side1.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+knightbodyparts/Basic-character_0001_right-arm2
+  rotate: false
+  xy: 105, 62
+  size: 39, 71
+  orig: 39, 71
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0002_right-shoukder2
+  rotate: false
+  xy: 146, 67
+  size: 34, 71
+  orig: 34, 71
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0003_body2
+  rotate: false
+  xy: 204, 164
+  size: 49, 85
+  orig: 49, 85
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0004_left-arm2
+  rotate: false
+  xy: 367, 184
+  size: 48, 65
+  orig: 48, 65
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0005_left-shoukder2-
+  rotate: false
+  xy: 182, 97
+  size: 31, 65
+  orig: 31, 65
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0006_neck2
+  rotate: false
+  xy: 182, 40
+  size: 30, 33
+  orig: 30, 33
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0007_right-leg2
+  rotate: false
+  xy: 117, 140
+  size: 34, 109
+  orig: 34, 109
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0008_pelvis2
+  rotate: false
+  xy: 2, 97
+  size: 45, 152
+  orig: 45, 152
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0009_left-leg2
+  rotate: false
+  xy: 49, 135
+  size: 34, 114
+  orig: 34, 114
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0010_rignt-thigh2
+  rotate: false
+  xy: 255, 168
+  size: 38, 81
+  orig: 38, 81
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0011_left-thigh2-
+  rotate: false
+  xy: 295, 165
+  size: 34, 84
+  orig: 34, 84
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0012_right-foot2
+  rotate: false
+  xy: 367, 162
+  size: 41, 20
+  orig: 41, 20
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0013_left-foot2
+  rotate: false
+  xy: 42, 2
+  size: 40, 20
+  orig: 40, 20
+  offset: 0, 0
+  index: -1
+knightbodyparts/Basic-character_0026_head
+  rotate: false
+  xy: 105, 17
+  size: 33, 43
+  orig: 33, 43
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0014_right-shoukder-resized
+  rotate: false
+  xy: 42, 24
+  size: 34, 71
+  orig: 34, 71
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0015_pelvis-resized
+  rotate: false
+  xy: 417, 187
+  size: 45, 62
+  orig: 45, 62
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0016_neck-resized
+  rotate: false
+  xy: 140, 27
+  size: 30, 33
+  orig: 30, 33
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0017_body-resized
+  rotate: false
+  xy: 153, 164
+  size: 49, 85
+  orig: 49, 85
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0018_right-thigh-resized
+  rotate: false
+  xy: 2, 14
+  size: 38, 81
+  orig: 38, 81
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0019_right-arm-resized
+  rotate: false
+  xy: 464, 178
+  size: 39, 71
+  orig: 39, 71
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0020_left-shoulder-resized
+  rotate: false
+  xy: 215, 97
+  size: 31, 65
+  orig: 31, 65
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0021_right-foot-resized
+  rotate: false
+  xy: 182, 75
+  size: 41, 20
+  orig: 41, 20
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0022_right-leg-resized
+  rotate: false
+  xy: 78, 24
+  size: 25, 109
+  orig: 25, 109
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0023_left-foot-resized
+  rotate: false
+  xy: 225, 75
+  size: 41, 20
+  orig: 41, 20
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0024_left-leg-resized
+  rotate: false
+  xy: 85, 135
+  size: 30, 114
+  orig: 30, 114
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0025_left-thigh-resized
+  rotate: false
+  xy: 331, 165
+  size: 34, 84
+  orig: 34, 84
+  offset: 0, 0
+  index: -1
+resized_naked_side1/LOGO_0027_left-arm-resized
+  rotate: false
+  xy: 248, 97
+  size: 19, 65
+  orig: 19, 65
+  offset: 0, 0
+  index: -1
