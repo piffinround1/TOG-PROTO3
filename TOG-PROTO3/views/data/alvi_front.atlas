@@ -1,0 +1,300 @@
+
+alvi_front.png
+size: 1022,1017
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Ball
+  rotate: false
+  xy: 770, 616
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+Face01
+  rotate: false
+  xy: 200, 80
+  size: 77, 29
+  orig: 77, 29
+  offset: 0, 0
+  index: -1
+Face02
+  rotate: false
+  xy: 291, 96
+  size: 67, 35
+  orig: 67, 35
+  offset: 0, 0
+  index: -1
+Layer 10
+  rotate: false
+  xy: 983, 231
+  size: 34, 108
+  orig: 34, 108
+  offset: 0, 0
+  index: -1
+Layer 2
+  rotate: false
+  xy: 362, 634
+  size: 368, 383
+  orig: 368, 383
+  offset: 0, 0
+  index: -1
+Layer 4
+  rotate: false
+  xy: 821, 695
+  size: 195, 90
+  orig: 195, 90
+  offset: 0, 0
+  index: -1
+Layer 4 copy
+  rotate: false
+  xy: 821, 603
+  size: 195, 90
+  orig: 195, 90
+  offset: 0, 0
+  index: -1
+Layer 5
+  rotate: false
+  xy: 362, 392
+  size: 216, 118
+  orig: 216, 118
+  offset: 0, 0
+  index: -1
+Layer 8
+  rotate: false
+  xy: 143, 16
+  size: 52, 55
+  orig: 52, 55
+  offset: 0, 0
+  index: -1
+Layer 8 copy
+  rotate: false
+  xy: 909, 204
+  size: 50, 48
+  orig: 50, 48
+  offset: 0, 0
+  index: -1
+Layer 9
+  rotate: false
+  xy: 580, 401
+  size: 68, 69
+  orig: 68, 69
+  offset: 0, 0
+  index: -1
+Layer10
+  rotate: false
+  xy: 821, 787
+  size: 201, 137
+  orig: 201, 137
+  offset: 0, 0
+  index: -1
+Layer12
+  rotate: false
+  xy: 715, 461
+  size: 30, 9
+  orig: 30, 9
+  offset: 0, 0
+  index: -1
+Layer14
+  rotate: false
+  xy: 362, 512
+  size: 261, 120
+  orig: 261, 120
+  offset: 0, 0
+  index: -1
+Layer15
+  rotate: false
+  xy: 732, 926
+  size: 288, 91
+  orig: 288, 91
+  offset: 0, 0
+  index: -1
+Layer16
+  rotate: false
+  xy: 713, 191
+  size: 42, 40
+  orig: 42, 40
+  offset: 0, 0
+  index: -1
+Layer20
+  rotate: false
+  xy: 2, 379
+  size: 358, 638
+  orig: 358, 638
+  offset: 0, 0
+  index: -1
+Layer24
+  rotate: false
+  xy: 842, 348
+  size: 89, 90
+  orig: 89, 90
+  offset: 0, 0
+  index: -1
+Layer6
+  rotate: false
+  xy: 933, 341
+  size: 74, 73
+  orig: 74, 73
+  offset: 0, 0
+  index: -1
+Prison
+  rotate: false
+  xy: 580, 472
+  size: 32, 38
+  orig: 32, 38
+  offset: 0, 0
+  index: -1
+Triangle-Sword
+  rotate: false
+  xy: 469, 115
+  size: 69, 75
+  orig: 75, 75
+  offset: 3, 0
+  index: -1
+back_hair
+  rotate: false
+  xy: 2, 2
+  size: 139, 69
+  orig: 139, 69
+  offset: 0, 0
+  index: -1
+boot L
+  rotate: false
+  xy: 291, 133
+  size: 87, 244
+  orig: 87, 244
+  offset: 0, 0
+  index: -1
+boot R
+  rotate: false
+  xy: 380, 146
+  size: 87, 244
+  orig: 87, 244
+  offset: 0, 0
+  index: -1
+bottle
+  rotate: false
+  xy: 909, 254
+  size: 72, 85
+  orig: 100, 100
+  offset: 15, 6
+  index: -1
+d arm_l
+  rotate: false
+  xy: 556, 202
+  size: 92, 188
+  orig: 92, 188
+  offset: 0, 0
+  index: -1
+d arm_r
+  rotate: false
+  xy: 934, 416
+  size: 74, 185
+  orig: 74, 185
+  offset: 0, 0
+  index: -1
+face
+  rotate: false
+  xy: 625, 472
+  size: 143, 160
+  orig: 143, 160
+  offset: 0, 0
+  index: -1
+foot L
+  rotate: false
+  xy: 715, 233
+  size: 125, 97
+  orig: 125, 97
+  offset: 0, 0
+  index: -1
+foot R
+  rotate: false
+  xy: 715, 332
+  size: 125, 106
+  orig: 125, 106
+  offset: 0, 0
+  index: -1
+hand_l
+  rotate: false
+  xy: 540, 113
+  size: 62, 77
+  orig: 62, 77
+  offset: 0, 0
+  index: -1
+hand_r
+  rotate: false
+  xy: 650, 215
+  size: 61, 80
+  orig: 61, 80
+  offset: 0, 0
+  index: -1
+left star
+  rotate: false
+  xy: 961, 209
+  size: 15, 43
+  orig: 15, 43
+  offset: 0, 0
+  index: -1
+main_hair
+  rotate: false
+  xy: 770, 440
+  size: 162, 161
+  orig: 162, 161
+  offset: 0, 0
+  index: -1
+right star
+  rotate: false
+  xy: 636, 157
+  size: 15, 43
+  orig: 15, 43
+  offset: 0, 0
+  index: -1
+shirt
+  rotate: false
+  xy: 2, 73
+  size: 196, 304
+  orig: 196, 304
+  offset: 0, 0
+  index: -1
+tail
+  rotate: false
+  xy: 842, 233
+  size: 65, 113
+  orig: 65, 113
+  offset: 0, 0
+  index: -1
+tie
+  rotate: false
+  xy: 604, 89
+  size: 30, 111
+  orig: 30, 111
+  offset: 0, 0
+  index: -1
+u arm_l
+  rotate: false
+  xy: 650, 297
+  size: 63, 173
+  orig: 63, 173
+  offset: 0, 0
+  index: -1
+u arm_r
+  rotate: false
+  xy: 469, 192
+  size: 85, 198
+  orig: 85, 198
+  offset: 0, 0
+  index: -1
+up leg L
+  rotate: false
+  xy: 200, 111
+  size: 89, 266
+  orig: 89, 266
+  offset: 0, 0
+  index: -1
+up right
+  rotate: false
+  xy: 732, 666
+  size: 87, 258
+  orig: 87, 258
+  offset: 0, 0
+  index: -1
