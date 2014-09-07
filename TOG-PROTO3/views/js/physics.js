@@ -155,35 +155,45 @@ physics.prototype.checkState = function(object,force){
 	//check if falling:
 	if(object.velocity.y > 0){
 		if(object.velocity.y < 1 && object.feet_sensor){
-			object.state = 'stance';
+			
+			if((Math.abs(object.velocity.x)).fixed(3) > 0){
+				object.pushState('walk');
+	
+			}else{
+				object.pushState('stance');
+
+			}
+			
+				
+		
+		
 		}else{
-			object.state = 'fall';
+			object.pushState('fall');
 		}
 	}else{
 		//if not falling then object is in jumping
-		object.state = 'jump';
+		object.pushState('jump');
 		
 	}
 
-	
+	/*
 	if((Math.abs(object.velocity.x)).fixed(3) > 0 ){
 		
-		if(object.state !== 'fall' && object.state !== 'jump'){
-			object.state = 'walk';
+		if(object.state.name !== 'fall' && object.state.name !== 'jump'){
+			object.pushState ('walk');
 		}
 	
-		//for orientation
-		object.orientation = (object.velocity.x).fixed(1) > 0 ? 'r': 'l';
+
 		
 	}else{
 		
-		if(object.state !== 'fall' && object.state !== 'jump'){
+		if(object.state.name !== 'fall' && object.state.name !== 'jump'){
 		
-			object.state = 'stance';
+			object.pushState('stance');
 		}
 	}
 
-	
+*/	
 	
 	
 };
@@ -235,9 +245,24 @@ physics.prototype.check_gravity = function(object,force){
 };
 
 
-physics.prototype.physics_movement_vector_from_direction = function(x,y,player) {
+physics.prototype.physics_movement_vector_from_direction = function(x,y,player,isMovement) {
 
-    //Must be fixed step, at physics sync speed.
+   
+	if(isMovement){
+		
+		player.velocity.x = x;
+		player.velocity.y = y;
+		
+		return {
+			
+			x: 0,
+			y: 0
+		
+		}
+	}
+	
+	
+	//Must be fixed step, at physics sync speed.
 	
 	/*calculate max force based on player.speed*/
 	var maxForce = (player.speed * this.fixedStep) * player.mass;

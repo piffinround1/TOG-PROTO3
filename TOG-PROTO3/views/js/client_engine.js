@@ -75,6 +75,9 @@ var client_engine = function(viewport,clientPlayer,players,stateDiv,plane,ctx){
 	    //UI
 	    
 	    
+	    
+	    this.clientPlayer.client_engine_instance = this;
+	    
 	    //objects that will be simulated by client physics
 		this.newtonian_objects = [this.clientPlayer];
 	    
@@ -114,7 +117,6 @@ client_engine.prototype.ui_config = function(){
 
 
 
-
 client_engine.prototype.create_timer = function(){
 	    setInterval(function(){
 	        this._dt = new Date().getTime() - this._dte;
@@ -126,17 +128,17 @@ client_engine.prototype.create_timer = function(){
 //player class
 
 
-	var game_player = function(dataPos,speed,id,state,isGhost,planeID,sequence,mass,width,height,sprite_map,jump_strength,cof_rest,inventory,armorSlots){
+	var game_player = function(dataPos,speed,id,state,isGhost,planeID,sequence,mass,width,height,sprite_map,jump_strength,cof_rest,inventory,armorSlots,permitted_states){
 	
 		this.pos = dataPos;
 		
-		
+		this.client_engine_instance;
 
 		this.inventory = inventory;
 		this.armorSlots = armorSlots;
 		
 		
-		this.state = state?state:'walk';
+		this.state = state?state:new PlayerState(name,duration,interruptable,animName,timeIssued);
 		this.id = id;
 		
 		this.old_pos_state = dataPos;
@@ -165,9 +167,14 @@ client_engine.prototype.create_timer = function(){
 		
 		this.player_server_updates = [];
 		
+		
+		this.player_permitted_states = permitted_states;
+		this.player_states = [];
+		this.player_states.push(this.state);
+		
 		this.sprite_map = sprite_map;
 		
-		this.orientation = 'r';
+		this.orientation = false;
 		
 		this.feet_sensor = false;
 		
@@ -197,8 +204,8 @@ client_engine.prototype.create_timer = function(){
 		
 		
 		this.firstDraw = true;
-		
-		
+		//for debugging purposes
+		this.playerConsole	 = jQuery('<div id="console'+this.id+'" class="console"></div>').appendTo('body');
 		
 	};
 
@@ -207,74 +214,89 @@ client_engine.prototype.create_timer = function(){
 				
 				if(!this.sprite){
 					
-					this.sprite = new TOGSprite(graphicsDevice,draw2D,this.sprite_map, this.pos.x,this.pos.y,this.state);
+					this.sprite = new TOGSprite(graphicsDevice,draw2D,this);
 					
 				}
 				
 				
 				if(!this.isGhost){
-				/*	//this.sprite = TOGUtils.getValueWithKey(this.state,this.sprite_map);
-				//	this.sprite.inverse(this.orientation);
-					ctx.fillStyle = this.color;
-					
-					var inc = 0;
-					var incVal = 10;
-					ctx.fillText("playerID: "+this.id, this.pos.x+this.width+10 - view_pan.x, this.pos.y+inc);
-					inc += incVal;
-					ctx.fillText("velocity x: "+this.velocity.x+ " y:"+this.velocity.y, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					
-					ctx.fillText("acceleration x: "+this.acceleration.x+ " y:"+this.acceleration.y, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					ctx.fillText("current state: "+this.state, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					ctx.fillText("current plane position x: "+this.pos.x+ " y:"+this.pos.y, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					
-					
-					
-					
-					ctx.save();
-					ctx.translate(this.pos.x - view_pan.x, this.pos.y - view_pan.y);
-				//	this.sprite.render(ctx);
-				//	this.sprite.update(dt);
-					
-					ctx.restore();*/
-					
-					
-				/*	
-					var inc = 0;
-					var incVal = 10;
-					ctx.fillText("playerID: "+this.id, this.pos.x+this.width+10 - view_pan.x, this.pos.y+inc);
-					inc += incVal;
-					ctx.fillText("velocity x: "+this.velocity.x+ " y:"+this.velocity.y, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					
-					ctx.fillText("acceleration x: "+this.acceleration.x+ " y:"+this.acceleration.y, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					ctx.fillText("current state: "+this.state, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					ctx.fillText("current plane position x: "+this.pos.x+ " y:"+this.pos.y, this.pos.x+this.width+10 - view_pan.x, this.pos.y + inc);
-					inc += incVal;
-					*/
+			
 					this.sprite.x = this.pos.x - view_pan.x;
 					this.sprite.y = this.pos.y - view_pan.y;
 					
+				//	this.playerConsole.html(this.state.animName);
 					
-					this.sprite.changeState.call(this.sprite,0,this.state,true);
+					this.playerConsole.css({
+						
+						top:this.pos.y - this.height,
+						left: this.pos.x
+					});
+					
+					
+					
+					jQuery('.console').html("player_states: "+this.player_states.length);
+					jQuery('.console').html(jQuery('.console').html()+"<br>current state: "+this.state.name);
+					
+					jQuery('.console').html(jQuery('.console').html()+"<br>velocity X: "+this.velocity.x);
+					jQuery('.console').html(jQuery('.console').html()+"<br>velocity Y: "+this.velocity.y);
+					jQuery('.console').html(jQuery('.console').html()+"<br>force x: "+this.force.x);
+					jQuery('.console').html(jQuery('.console').html()+"<br>force Y: "+this.force.y);
+					jQuery('.console').html(jQuery('.console').html()+"<br>acc X: "+this.acceleration.x);
+					jQuery('.console').html(jQuery('.console').html()+"<br>acc Y: "+this.acceleration.y);
+					
+					
+				//	this.playerConsole.html(this.playerConsole.html()+'<br>Client time:'+this.client_engine_instance.local_time);
+					
+					this.sprite.changeOrientation(this.orientation);
+					//determine current state from queued states
+					this.determineState();
+					
+					
+					
 					//call unEquipAll
 					this.unEquipAll();
 					this.equipAll();
 					
-				}/*else{
-					ctx.fillStyle = this.color;
-					ctx.fillRect(this.pos.x,this.pos.y,150,300);
-					ctx.fillText(this.id, this.pos.x+150+10, this.pos.y + 4);
-					
-				}*/
+				}
 				
 			},
 	
+			determineState: function(){
+			
+				if(!this.player_states||!this.player_states[0]) return;
+						
+				this.state = this.player_states[0];
+				this.player_states.splice(0,1);
+				
+				if(!this.sprite || !this.state) return;
+					
+				this.sprite.setState(0,this.state,true);
+				
+			},
+			
+			
+			
+			
+			
+			pushState: function(state){
+				if(!this.sprite ) return;
+				
+				if((!this.state.interruptable && !this.state.isDone()) || this.state.name == state) return;
+				
+				for(var i in this.player_permitted_states){
+					var onestate = this.player_permitted_states[i];
+					
+					if(state === onestate.name ){
+						
+						var pushedState = new PlayerState(onestate.name,onestate.duration,onestate.interruptable,onestate.animName,onestate.loop, new Date().getTime());
+						this.player_states.push(pushedState);
+						
+						break;
+					}
+				}
+				
+				
+			},
 	
 			equip: function(slotName,inventoryName){
 				
@@ -402,6 +424,10 @@ client_engine.prototype.create_timer = function(){
 				}
 			
 			}
+			
+			
+			
+			
 	
 	};
 	
@@ -426,13 +452,14 @@ client_engine.prototype.create_physics_loop = function(){
 
 
 
-client_engine.prototype.process_input = function( player ) {
+client_engine.prototype.process_input = function(player) {
 
     //It's possible to have recieved multiple inputs by now,
     //so we process each one
     var x_dir = 0;
     var y_dir = 0;
     var ic = player.inputs.length;
+    var isMovement = false;
     if(ic) {
         for(var j = 0; j < ic; ++j) {
                 //don't process ones we already have simulated locally
@@ -443,10 +470,17 @@ client_engine.prototype.process_input = function( player ) {
             for(var i = 0; i < c; ++i) {
                 var key = input[i];
                 if(key == 'l') {
-                    x_dir -= 1;
+                    //x_dir -= 1;
+                	x_dir  = player.speed *-1;
+                	isMovement = true;
+                	
+                	player.orientation = true;
                 }
                 if(key == 'r') {
-                    x_dir += 1;
+                   // x_dir += 1;
+                    x_dir = player.speed;
+                	isMovement = true;
+                	player.orientation = false;
                 }
                 /* down disabled 
                 
@@ -458,13 +492,16 @@ client_engine.prototype.process_input = function( player ) {
                   y_dir = -1;
                     
                 }
+                
+                this.do_skill(key,player);
+                
             } //for all input values
 
         } //for each input command
     } //if we have inputs
     
         //we have a direction vector now, so apply the same physics as the client
-    var resulting_vector = this.physics.physics_movement_vector_from_direction(x_dir,y_dir,player);
+    var resulting_vector = this.physics.physics_movement_vector_from_direction(x_dir,y_dir,player,isMovement);
     if(player.inputs.length) {
         //we can now clear the array since these have been processed
     	
@@ -479,6 +516,27 @@ client_engine.prototype.process_input = function( player ) {
 };
 
 
+client_engine.prototype.do_skill = function(key,player){
+	
+	if(!key||key.length < 1) return;
+	
+	if(key === 'sk1'){
+		player.pushState( 'skill1');
+	}
+	
+	if(key === 'sk2'){
+		
+		player.pushState( 'skill2');
+	}
+	
+	if(key === 'sk3'){
+		
+		player.pushState( 'skill3');
+	}
+
+	
+};
+
 
 client_engine.prototype.handle_user_input = function(){
 	
@@ -489,34 +547,42 @@ client_engine.prototype.handle_user_input = function(){
 	 this.client_has_input = false;
 	
 
-	    if( keyboard.isDown('A') ||
-	        keyboard.isDown('left')) {
+	 if(keyboard.isDown('left')) {
 	    
 	            input.push('l');
 
 	    } //left
 
-	    if( keyboard.isDown('D') ||
-	        keyboard.isDown('right')) {
+	    if(keyboard.isDown('right')) {
 
 	            input.push('r');
 
 	        } //right
-/*
- * disable down
-	    if( keyboard.isDown('S') ||
-	        keyboard.isDown('down')) {
 
-	            input.push('d');
+	   if( keyboard.isDown('Q')) {
 
-	
-	   } //down
-*/
-	    if( keyboard.isDown('W') ||
-	        keyboard.isDown('up')) {
+	            input.push('sk1');
+
+	   }
+	   
+	   if( keyboard.isDown('W')) {
+
+           input.push('sk2');
+
+	   }
+
+	   if( keyboard.isDown('E')) {
+
+           input.push('sk3');
+
+	   }
+
+	   
+	   
+
+	    if(keyboard.isDown('SPACE')) {
 	    		input.push('u');
 	    	
-	  
 	    } //up
 	    
 	    
@@ -524,20 +590,23 @@ client_engine.prototype.handle_user_input = function(){
 	    //for viewport panning
 	    if(keyboard.isDown('E')){
 	    
-	    	if((this.view_pan.x + this.viewport.width) < this.plane.width){
+	    	/*if((this.view_pan.x + this.viewport.width) < this.plane.width){
 	    		this.view_pan.x += this.pan_speed;
 	    	}else{
 	    		this.view_pan.x =  this.plane.width - this.viewport.width;
 	    	}
+	    	*/
+	    	
+	    	
 	    	
 	    }
 	    
 	    if(keyboard.isDown('Q')){
-	    	if(this.view_pan.x > 0){
+	    	/*if(this.view_pan.x > 0){
 	    		this.view_pan.x -= this.pan_speed;
 	    	}else{
 	    		this.view_pan.x = 0;
-	    	}
+	    	}*/
 	    }
 	    
 	    //for gui
@@ -546,7 +615,7 @@ client_engine.prototype.handle_user_input = function(){
 	    	// alert('inventory up');
 	    	//this.clientPlayer.sprite.toggleEquip();
 	    	//alert('inventory done');
-	    	this.tog_ui.inventoryWindow(this.clientPlayer.inventory,this.clientPlayer.armorSlots,this.clientPlayer);
+	    /*	this.tog_ui.inventoryWindow(this.clientPlayer.inventory,this.clientPlayer.armorSlots,this.clientPlayer);*/
 	    
 	    }
 	    

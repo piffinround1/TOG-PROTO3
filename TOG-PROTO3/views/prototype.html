@@ -23,6 +23,7 @@
 
 <script  src="js/input.js"></script>
 <script  src="js/resources.js"></script>
+<script  src="js/togcore.js"></script>
 <script  src="js/TOG.js"></script>
 <script  src="js/TOGUtils.js"></script>
 <script  src="js/TOGUI.js"></script>
@@ -41,6 +42,8 @@
 <div class='portholder'><canvas id='viewport'></canvas>
 </div>
 <div class='clear'></div>
+
+
 
 </body>
 
@@ -94,12 +97,12 @@ function getClientPlayerCredentials(){
 	
 	
 	var clientPlayerTemp = {pos: posTemp, 
-							speed : 600, 
+							speed : 2, 
 							playerID : 'test1', 
 							planeID : 'planeID1', 
 							serverSequence: 0, 
 							cof_rest: -0.1, 
-							sprite_map: 'side1',
+							sprite_map: 'alvi_front',
 							pan_speed : 0.5,
 							jump_strength: 20000,
 							mass: 70
@@ -180,10 +183,22 @@ function createClientPlayer(plane){
 	                  
 	                  ];
 	
+	var permitted_states = [
+	                        
+	                        
+	                        new PlayerState('walk',0,true,'walk',true,false),
+	                        new PlayerState('stance',0,true,'stance',true,false),
+	                        new PlayerState('jump',0,true,'jump',true,false),
+	                        new PlayerState('fall',0,true,'fall',true,false),
+	                        new PlayerState('skill1',1500,false,'skill1',false,true),
+	                        new PlayerState('skill2',2000,false,'skill2',false,true),
+	                        new PlayerState('skill3',2000,false,'skill3',false,true),
+		                        
+	                        
+	                        ];
 	
-	
-	var cp = new game_player(cpPos,clientPlayer.speed,clientPlayer.playerID,'walk',false,clientPlayer.planeID,
-			clientPlayer.serverSequence,clientPlayer.mass,null,null,sprite_map,clientPlayer.jump_strength,clientPlayer.cof_rest,inventory,armorSlots);
+	var cp = new game_player(cpPos,clientPlayer.speed,clientPlayer.playerID, new PlayerState('walk',0,true,'walk',true, new Date().getTime()),false,clientPlayer.planeID,
+			clientPlayer.serverSequence,clientPlayer.mass,null,null,sprite_map,clientPlayer.jump_strength,clientPlayer.cof_rest,inventory,armorSlots,permitted_states);
 	
 	startClient(cp,plane);
 }

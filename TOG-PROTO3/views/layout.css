@@ -26,6 +26,15 @@ clear:both;
 	
 }
 
+.console{
+	position:absolute;
+	width:200px;
+	height:200px;
+	z-index:1000;
+	
+	 background-color:#ffffff;
+}
+
 .portholder{
 		
 	text-align: center;

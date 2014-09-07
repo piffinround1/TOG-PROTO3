@@ -1,18 +1,21 @@
 
 
 
-function TOGSprite(gd,draw2d,name,initX,initY,initState,permittedEquip) {
+function TOGSprite(gd,draw2d,gamePlayer) {
     this.atlas;
-    this.skeletonName = name;
+    this.skeletonName = gamePlayer.sprite_map;
     this.skeletonData;
     this.vertices = [];
     this.graphicsDevice = gd;
     this.draw2d = draw2d;
-  
-    this.x = initX;
-    this.y = initY;
     
-    this.state = initState;
+    this.orientation = gamePlayer.orientation? gamePlayer.orientation : false;
+  
+    this.x = gamePlayer.pos.x;
+    this.y = gamePlayer.pos.y;
+    
+    this.state = gamePlayer.state;
+    this.gamePlayer = gamePlayer;
     this.skeleton;
     
     //load sprite obj 
@@ -89,6 +92,7 @@ TOGSprite.prototype.waitForTexture = function(){
 TOGSprite.prototype.loadSkeletonData = function(skeletonText){
 	
 	var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(this.atlas));
+	json.scale = 0.4;
 	this.skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
 	this.start();
 	
@@ -101,19 +105,24 @@ TOGSprite.prototype.start = function(){
 	spine.Bone.yDown = true;
 
 	this.skeleton = new spine.Skeleton(this.skeletonData);
-	this.skeleton.getRootBone().x = this.x;
-	this.skeleton.getRootBone().y = this.y;
+	this.skeleton.x = this.x;
+	this.skeleton.y = this.y;
 	this.skeleton.updateWorldTransform();
 
 	var stateData = new spine.AnimationStateData(this.skeletonData);	
 	this.animState = new spine.AnimationState(stateData);
-
-	this.skeleton.setSkinByName("default1");
+	
+	this.skeleton.setSkinByName("default");
+	
+	
+	
+	
 	this.skeleton.setSlotsToSetupPose();
-	this.animState.setAnimationByName(0,this.state, true);
+	
+	this.animState.setAnimationByName(0,this.state.animName, true);
 	
 	
-//	var bgColor = [0.9, 0.9, 0.9, 1.0];
+
 	var batch = new SpriteBatch(this.draw2d);
 	var lastTime = TurbulenzEngine.time;
 	
@@ -125,11 +134,19 @@ TOGSprite.prototype.start = function(){
 		lastTime = TurbulenzEngine.time;
 		this.animState.update(delta);
 		this.animState.apply(this.skeleton);
-		this.skeleton.getRootBone().x = this.x;
-		this.skeleton.getRootBone().y = this.y;
+		
+		/*if(this.animState.animation){
+			this.state = this.animState.animation.name;
+			jQuery('.console').html(jQuery('.console').html()+"<br>cuurent "+this.state);
+		}*/
+		
+		this.skeleton.x = this.x;
+		this.skeleton.y = this.y;
+		
+		this.skeleton.flipX = this.orientation;
 		this.skeleton.updateWorldTransform();
 		
-//		this.graphicsDevice.clear(bgColor, 1.0);
+
 		
 		batch.begin(this.draw2d.blend.alpha);
 		this.drawSkeleton(batch, this.skeleton);
@@ -144,16 +161,46 @@ TOGSprite.prototype.start = function(){
 
 
 
-TOGSprite.prototype.changeState = function(trackIndex,state,loop,delay){
+TOGSprite.prototype.setState = function(trackIndex,state){
+	
 	if(!this.animState) return;
 	
-	if(this.state != state){
-		this.animState.setAnimationByName(trackIndex,state,loop,delay);
+	
+	if(this.state.name != state.name){
+		
+		
+		this.animState.setAnimationByName(trackIndex,state.animName,state.loop);
+		this.skeleton.setBonesToSetupPose();
+		this.state = state;
 	}
-	this.state = state;
+	
+	
+	
+	
 	
 };
 
+
+TOGSprite.prototype.addState = function(trackIndex,state,loop){
+	
+	if(!this.animState) return;
+	
+		
+		this.animState.addAnimationByName(trackIndex,state,loop,0);
+	
+	
+
+	//this.state = state;
+	
+};
+
+
+
+
+
+TOGSprite.prototype.changeOrientation = function(orientation){
+	this.orientation = orientation;
+}
 
 
 TOGSprite.prototype.equipSlot = function (slotName,attachmentName){	
@@ -218,34 +265,31 @@ TOGSprite.prototype.hasEquip = function (slotName){
 
 TOGSprite.prototype.drawSkeleton = function (batch, skeleton){
 	
-	 
-      	var drawOrder = skeleton.drawOrder;
-      	for (var i = 0, n = drawOrder.length; i < n; i++) {
-      		var slot = drawOrder[i];
-      		var attachment = slot.attachment;
-      		if (!(attachment instanceof spine.RegionAttachment)) continue;
-      		attachment.computeVertices(skeleton.x, skeleton.y, slot.bone, this.vertices);
-      		
-      		var blendMode = slot.data.additiveBlending ? this.draw2d.blend.additive : this.draw2d.blend.alpha;
-      		if (batch.blendMode != blendMode) {
-      			batch.end();
-      			batch.begin(blendMode);
-      		}
-
-      		batch.add(
-      			attachment.rendererObject.page.rendererObject,
-      			this.vertices[0], this.vertices[1],
-      			this.vertices[6], this.vertices[7],
-      			this.vertices[2], this.vertices[3],
-      			this.vertices[4], this.vertices[5],
-      			skeleton.r * slot.r,
-      			skeleton.g * slot.g,
-      			skeleton.b * slot.b,
-      			skeleton.a * slot.a,
-      			attachment.uvs[0], attachment.uvs[1],
-      			attachment.uvs[4], attachment.uvs[5]
-      		);
-      	}
+	var drawOrder = skeleton.drawOrder;
+	for (var i = 0, n = drawOrder.length; i < n; i++) {
+	var slot = drawOrder[i];
+	var attachment = slot.attachment;
+	if (!(attachment instanceof spine.RegionAttachment)) continue;
+	attachment.computeVertices(skeleton.x, skeleton.y, slot.bone, this.vertices);
+	var blendMode = slot.data.additiveBlending ? draw2D.blend.additive : draw2D.blend.alpha;
+	if (batch.blendMode != blendMode) {
+	batch.end();
+	batch.begin(blendMode);
+	}
+	batch.add(
+	attachment.rendererObject.page.rendererObject,
+	this.vertices[0], this.vertices[1],
+	this.vertices[6], this.vertices[7],
+	this.vertices[2], this.vertices[3],
+	this.vertices[4], this.vertices[5],
+	skeleton.r * slot.r,
+	skeleton.g * slot.g,
+	skeleton.b * slot.b,
+	skeleton.a * slot.a,
+	attachment.uvs[0], attachment.uvs[1],
+	attachment.uvs[4], attachment.uvs[5]
+	);
+	}
       	
 };
 

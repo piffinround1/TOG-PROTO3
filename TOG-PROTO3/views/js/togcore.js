@@ -158,6 +158,30 @@ togcore.prototype.translate = function(arr){return {x:arr[0],y:arr[1]};};
 togcore.prototype.isEqual = function(a,b){return (a.x === b.x && a.y === b.y);};
 
 
+function PlayerState(name,duration,interruptable,animName,loop, timeIssued,disableMovement){
+	
+	this.name = name;
+	
+	this.duration = duration;
+	this.interruptable = interruptable;
+	this.animName = animName;
+	this.loop = loop;
+	this.timeIssued = timeIssued;
+	this.disableMovement = disableMovement;
+	
+	this.isDone = function(){
+		var timeNow = new Date().getTime();
+		if((timeNow - this.timeIssued)> duration){
+			return true;
+		}else{
+			return false;
+		}
+	
+	};
+	
+	
+};
+
 
 
 
