@@ -128,7 +128,7 @@ client_engine.prototype.create_timer = function(){
 //player class
 
 
-	var game_player = function(dataPos,speed,id,state,isGhost,planeID,sequence,mass,width,height,sprite_map,jump_strength,cof_rest,inventory,armorSlots,permitted_states){
+	var game_player = function(dataPos,speed,id,state,isGhost,planeID,sequence,mass,width,height,sprite_map,jump_strength,cof_rest,inventory,armorSlots,permitted_states,hp){
 	
 		this.pos = dataPos;
 		
@@ -163,7 +163,7 @@ client_engine.prototype.create_timer = function(){
 		this.acceleration = {x:0,y:0,z:0};
 		
 		this.mass = mass ;
-		
+		this.hp = hp;
 		
 		this.player_server_updates = [];
 		
@@ -206,11 +206,27 @@ client_engine.prototype.create_timer = function(){
 		this.firstDraw = true;
 		//for debugging purposes
 		this.playerConsole	 = jQuery('<div id="console'+this.id+'" class="console"></div>').appendTo('body');
+		this.isDead = false;
 		
 	};
 
 	game_player.prototype = {
 			draw : function(ctx,dt,view_pan,te,gd,draw2d){
+				
+				
+				
+				jQuery('.console').html("player_states: "+this.player_states.length);
+				jQuery('.console').html(jQuery('.console').html()+"<br>current state: "+this.state.name);
+				
+				jQuery('.console').html(jQuery('.console').html()+"<br>velocity X: "+this.velocity.x);
+				jQuery('.console').html(jQuery('.console').html()+"<br>velocity Y: "+this.velocity.y);
+				jQuery('.console').html(jQuery('.console').html()+"<br>force x: "+this.force.x);
+				jQuery('.console').html(jQuery('.console').html()+"<br>force Y: "+this.force.y);
+				jQuery('.console').html(jQuery('.console').html()+"<br>acc X: "+this.acceleration.x);
+				jQuery('.console').html(jQuery('.console').html()+"<br>acc Y: "+this.acceleration.y);
+				jQuery('.console').html(jQuery('.console').html()+"<br>HP  "+this.hp);
+				
+				if(this.isDead) return;
 				
 				if(!this.sprite){
 					
@@ -229,20 +245,11 @@ client_engine.prototype.create_timer = function(){
 					this.playerConsole.css({
 						
 						top:this.pos.y - this.height,
-						left: this.pos.x
+						left: this.pos.x - this.width
 					});
 					
 					
-					
-					jQuery('.console').html("player_states: "+this.player_states.length);
-					jQuery('.console').html(jQuery('.console').html()+"<br>current state: "+this.state.name);
-					
-					jQuery('.console').html(jQuery('.console').html()+"<br>velocity X: "+this.velocity.x);
-					jQuery('.console').html(jQuery('.console').html()+"<br>velocity Y: "+this.velocity.y);
-					jQuery('.console').html(jQuery('.console').html()+"<br>force x: "+this.force.x);
-					jQuery('.console').html(jQuery('.console').html()+"<br>force Y: "+this.force.y);
-					jQuery('.console').html(jQuery('.console').html()+"<br>acc X: "+this.acceleration.x);
-					jQuery('.console').html(jQuery('.console').html()+"<br>acc Y: "+this.acceleration.y);
+				
 					
 					
 				//	this.playerConsole.html(this.playerConsole.html()+'<br>Client time:'+this.client_engine_instance.local_time);
@@ -264,7 +271,12 @@ client_engine.prototype.create_timer = function(){
 			determineState: function(){
 			
 				if(!this.player_states||!this.player_states[0]) return;
-						
+				if(this.hp <= 0 && !this.isDead){
+					this.isDead = true;
+					this.pushState('dead');
+				}
+				
+				
 				this.state = this.player_states[0];
 				this.player_states.splice(0,1);
 				
@@ -274,9 +286,10 @@ client_engine.prototype.create_timer = function(){
 				
 			},
 			
-			
-			
-			
+			takeDamage : function(){
+				
+				
+			},
 			
 			pushState: function(state){
 				if(!this.sprite ) return;
@@ -534,7 +547,16 @@ client_engine.prototype.do_skill = function(key,player){
 		player.pushState( 'skill3');
 	}
 
+	if(key === 'la'){
+		
+		player.pushState( 'light_attack');
+	}
 	
+	if(key === 'ha'){
+		
+		player.hp = 0;
+	}
+
 };
 
 
@@ -578,7 +600,16 @@ client_engine.prototype.handle_user_input = function(){
 	   }
 
 	   
-	   
+	   if(keyboard.isDown('left_click')) {
+   			
+		   input.push('la');
+   	
+	   } //up
+	   if(keyboard.isDown('right_click')) {
+  			
+		   input.push('ha');
+   	
+	   } 
 
 	    if(keyboard.isDown('SPACE')) {
 	    		input.push('u');

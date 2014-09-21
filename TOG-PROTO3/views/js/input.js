@@ -36,9 +36,48 @@
     window.addEventListener('blur', function() {
         pressedKeys = {};
     });
+    
+    
+    jQuery(document).mousedown(function(event) {
+       
+    	switch (event.which) {
+            case 1:
+            	
+            	pressedKeys['LEFT_CLICK'] = true;
+                break;
+            case 2:
+            	pressedKeys['mid_click'] = true;
+                break;
+            case 3:
+            	pressedKeys['RIGHT_CLICK'] = true;
+                break;
+            default:
+             
+        }
+    });
+    
+    jQuery(document).mouseup(function(event) {
+        
+    	switch (event.which) {
+            case 1:
+            	pressedKeys['LEFT_CLICK'] = false;
+                break;
+            case 2:
+            	pressedKeys['mid_click'] = false;
+                break;
+            case 3:
+            	pressedKeys['RIGHT_CLICK'] = false;
+                break;
+            default:
+             
+        }
+    });
+    
+    
 
     window.keyboard = {
         isDown: function(key) {
+        	
             return pressedKeys[key.toUpperCase()];
         }
     };

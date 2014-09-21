@@ -105,7 +105,8 @@ function getClientPlayerCredentials(){
 							sprite_map: 'alvi_front',
 							pan_speed : 0.5,
 							jump_strength: 20000,
-							mass: 70
+							mass: 70,
+							hp: 2000
 	};
 	var view_pan_temp = {x:0,y:0};
 	
@@ -193,12 +194,12 @@ function createClientPlayer(plane){
 	                        new PlayerState('skill1',1500,false,'skill1',false,true),
 	                        new PlayerState('skill2',2000,false,'skill2',false,true),
 	                        new PlayerState('skill3',2000,false,'skill3',false,true),
-		                        
-	                        
+	                        new PlayerState('light_attack',300,false,'light_attack',false,true),   
+	                        new PlayerState('dead',600,false,'dead',false,true)
 	                        ];
 	
 	var cp = new game_player(cpPos,clientPlayer.speed,clientPlayer.playerID, new PlayerState('walk',0,true,'walk',true, new Date().getTime()),false,clientPlayer.planeID,
-			clientPlayer.serverSequence,clientPlayer.mass,null,null,sprite_map,clientPlayer.jump_strength,clientPlayer.cof_rest,inventory,armorSlots,permitted_states);
+			clientPlayer.serverSequence,clientPlayer.mass,null,null,sprite_map,clientPlayer.jump_strength,clientPlayer.cof_rest,inventory,armorSlots,permitted_states,clientPlayer.hp);
 	
 	startClient(cp,plane);
 }

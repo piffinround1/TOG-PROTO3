@@ -248,7 +248,7 @@ physics.prototype.check_gravity = function(object,force){
 physics.prototype.physics_movement_vector_from_direction = function(x,y,player,isMovement) {
 
    
-	if(isMovement){
+	if(isMovement && player.feet_sensor){
 		
 		player.velocity.x = x;
 		player.velocity.y = y;

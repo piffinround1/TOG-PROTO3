@@ -222,7 +222,7 @@
 	}
 },
 "animations": {
-	"Alvi_BasicAttack": {
+	"light_attack": {
 		"slots": {
 			"Ball": {
 				"attachment": [
@@ -687,7 +687,7 @@
 			}
 		]
 	},
-	"Alvi_Dead": {
+	"dead": {
 		"slots": {
 			"Ball": {
 				"attachment": [
