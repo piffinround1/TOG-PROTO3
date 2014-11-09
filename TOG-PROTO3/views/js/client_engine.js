@@ -68,50 +68,46 @@ var client_engine = function(viewport,clientPlayer,players,stateDiv,plane,ctx){
 		
 	    this.server_updates = []; //client's server update
 	    
-	    
-//	    this.clientGhost = new game_player(clientPlayer.pos,clientPlayer.speed,clientPlayer.id+" server pos",clientPlayer.state,true,clientPlayer.planeID);
-	    
-	    
-	    //UI
-	    
-	    
-	    
+  
 	    this.clientPlayer.client_engine_instance = this;
 	    
 	    //objects that will be simulated by client physics
 		this.newtonian_objects = [this.clientPlayer];
 	    
 	    this.ui_config();
-	    
-		
-	    
-	    
+
 	    this.create_config();
 		
 		this.create_timer();
 		
 		this.create_physics_loop();
 		
-	
-		
-		
-		
-		
-		
-		
-		
+		//connect to server
+		this.connect_to_server();
 		//start polling mechanism
 		//this.poll_server();
 		
 	};
 	
+client_engine.prototype.connect_to_server = function(){
+	
+	this.socket = io.connect('/');
+	
+	this.socket.on('svr_conf',function(data){
+		
+		console.log(data.msg);
+		
+	});
+	
+	this.socket.send('a message from client');
+	
+	
+};
+	
+	
 client_engine.prototype.ui_config = function(){
 	
-	
 	this.tog_ui = new TOGUI();
-
-	
-	
 };
 
 
@@ -225,8 +221,8 @@ client_engine.prototype.create_timer = function(){
 				jQuery('.console').html(jQuery('.console').html()+"<br>acc X: "+this.acceleration.x);
 				jQuery('.console').html(jQuery('.console').html()+"<br>acc Y: "+this.acceleration.y);
 				jQuery('.console').html(jQuery('.console').html()+"<br>HP  "+this.hp);
+				jQuery('.console').html(jQuery('.console').html()+"<br>isDead?  "+this.isDead);
 				
-				if(this.isDead) return;
 				
 				if(!this.sprite){
 					
@@ -240,7 +236,6 @@ client_engine.prototype.create_timer = function(){
 					this.sprite.x = this.pos.x - view_pan.x;
 					this.sprite.y = this.pos.y - view_pan.y;
 					
-				//	this.playerConsole.html(this.state.animName);
 					
 					this.playerConsole.css({
 						
@@ -248,11 +243,6 @@ client_engine.prototype.create_timer = function(){
 						left: this.pos.x - this.width
 					});
 					
-					
-				
-					
-					
-				//	this.playerConsole.html(this.playerConsole.html()+'<br>Client time:'+this.client_engine_instance.local_time);
 					
 					this.sprite.changeOrientation(this.orientation);
 					//determine current state from queued states
@@ -270,12 +260,11 @@ client_engine.prototype.create_timer = function(){
 	
 			determineState: function(){
 			
-				if(!this.player_states||!this.player_states[0]) return;
 				if(this.hp <= 0 && !this.isDead){
-					this.isDead = true;
 					this.pushState('dead');
 				}
 				
+				if(!this.player_states||!this.player_states[0]) return;
 				
 				this.state = this.player_states[0];
 				this.player_states.splice(0,1);
@@ -286,9 +275,11 @@ client_engine.prototype.create_timer = function(){
 				
 			},
 			
-			takeDamage : function(){
+			takeDamage : function(damage){
 				
-				
+				this.hp = this.hp - damage.hp;
+				this.pushState('damage');
+		
 			},
 			
 			pushState: function(state){
@@ -554,7 +545,7 @@ client_engine.prototype.do_skill = function(key,player){
 	
 	if(key === 'ha'){
 		
-		player.hp = 0;
+		player.takeDamage({hp:20});
 	}
 
 };
@@ -670,7 +661,8 @@ client_engine.prototype.handle_user_input = function(){
 				 playerID : this.clientPlayer.id,
 				 inputs : input,
 				 sequence: this.input_seq,
-				 time : this.local_time.toFixed(3)
+				 time : this.local_time.toFixed(3),
+				 type:'i'
 		 };
 		 
 	//	 jQuery.post('/TOG-1-0/TestActionReceiverServlet',packet);
@@ -702,34 +694,10 @@ client_engine.prototype.update = function(t){
 
 client_engine.prototype.client_update = function(){
     
-	
-	//Clear the screen area
-    //this.ctx.clearRect(0,0,this.viewport.width,this.viewport.height);
-    
-	
-    
-    //ensure that view pans are within the limit
-	this.view_pan.x = this.view_pan.x < 0 ? 0: this.view_pan.x;
-	this.view_pan.x = this.view_pan.x + this.viewport.width > this.plane.width ? this.plane.width - this.viewport.width: this.view_pan.x; 
-
-  /*  this.ctx.drawImage(resources.get('img/sample_background.png'),
-            this.view_pan.x, this.view_pan.y,this.viewport.width,this.viewport.height,0,0,this.viewport.width,this.viewport.height
-           );*/
-  //  this.ctx.fillStyle = this.terrainPattern;
-  // this.ctx.fillRect(0, 0, this.viewport.width, this.viewport.height);
-    
-    
-    
-    
-    
+	    
     this.handle_user_input();
   
-    this.draw_info();
-    
    
-    
-    //net updates other players
-    this.entity_interpolation();
     
     //draw other players
     this.draw_other_players();
@@ -743,15 +711,6 @@ client_engine.prototype.client_update = function(){
     }
   
     
-    //draw projectile line
- /*   
-    this.ctx.beginPath();
-	this.ctx.moveTo(this.clientPlayer.cur_pos_state.x-this.view_pan.x,(this.clientPlayer.cur_pos_state.y + this.clientPlayer.height/2));
-	this.ctx.lineTo(this.mousepos.x,this.mousepos.y);
-	this.ctx.stroke();
-	*/
-    
-    
     this.calculate_fps();
 };
 
@@ -761,63 +720,6 @@ client_engine.prototype.draw_other_players = function(){
 	}
 };
 
-
-client_engine.prototype.draw_info = function(){
-	
-/*	this.ctx.fillStyle = this.info_color;*/
-	var info_pos = {x:0,y:0};
-	
-/*	this.ctx.font="10px Arial";
-	this.ctx.fillText('Local Time: '+this.local_time.fixed(),info_pos.x + this.viewport.width - 100,info_pos.y+10);
-	info_pos.y += 10;
-	this.ctx.fillText('FPS: '+this.fps_avg.fixed(),info_pos.x + this.viewport.width - 100,info_pos.y+10);
-	info_pos.y += 10;
-	
-	this.ctx.fillText('Net Latency: '+this.latency_avg,info_pos.x+ this.viewport.width - 100,info_pos.y+10);
-	info_pos.y += 10;
-	
-	//mouse position... follow mouse pointer
-	this.ctx.fillText('Mouse pos: x'+this.mousepos.x +' y:'+ this.mousepos.y, this.mousepos.x,this.mousepos.y);*/
-	
-	
-	
-	
-	jQuery(this.stateDiv).find('.snapshot_value').html(this.snapshot_value_string);
-	jQuery(this.stateDiv).find('.pos_value').html('x:'+this.clientPlayer.pos.x+'y:'+this.clientPlayer.pos.y+' @ sequence:'+this.input_seq);
-	
-	jQuery(this.stateDiv).find('.server_time_value').html(''+this.server_time);
-	
-	jQuery(this.stateDiv).find('.client_time_value').html(''+this.client_time.fixed());
-	
-	
-	jQuery(this.stateDiv).find('.server_update_value').html(this.clientPlayer.state);
-	
-	
-	if(this.server_updates.length){
-		
-		var firstElem = this.server_updates[0];
-		var lastElem = this.server_updates[this.server_updates.length-1];
-		var firstElemPos = this.translate(firstElem.pos);
-		var lastElemPos = this.translate(lastElem.pos);
-		jQuery(this.stateDiv).find('.server_update_first').html('X POS:'+ firstElemPos.x +'Y POS:'+firstElemPos.y +' @ server time:'+firstElem.time);
-		jQuery(this.stateDiv).find('.server_update_last').html('X POS:'+ lastElemPos.x +'Y POS:'+lastElemPos.y+' @ server time:'+lastElem.time);
-
-	}
-	
-	jQuery(this.stateDiv).find('.oldest_tick_value').html(''+this.oldest_tick);
-	if(this.clientPlayer.inputs.length){
-		jQuery(this.stateDiv).find('.client_player_input_size_value').html(''+this.clientPlayer.inputs.length+' sequence:'+
-				this.clientPlayer.inputs[this.clientPlayer.inputs.length-1].sequence);
-
-	}
-	if(this.players.length){
-		jQuery(this.stateDiv).find('.other_player_size_value').html(''+this.players.length);
-		
-	}
-	
-	jQuery(this.stateDiv).find('.pan_controls_val').html("current pan x:"+this.view_pan.x+" current pan y:" +this.view_pan.y);
-	this.ctx.font="10px Arial";
-};
 
 
 
@@ -927,83 +829,18 @@ client_engine.prototype.update_local_position = function(){
 };
 
 client_engine.prototype.poll_server = function(){
-		jQuery.ajax({
+		/*jQuery.ajax({
 				url:'/TOG-1-0/AsyncTestServlet',
 				data:"{planeID:testID1PlaneID}",
 				success:this.update_snapshot.bind(this),
 				complete:this.poll_server.bind(this),
-				dataType:'JSON',
-				timeout: 400
-				});
-};
-
-
-client_engine.prototype.net_update_correction = function(){
-	
-	if(!this.server_updates.length) return;
-	
-	var latest_server_data = this.server_updates[this.server_updates.length -1];
-	//check if the latest server data is game or input
-	var data_input_source = latest_server_data.source;
-	
-	//if(data_input_source === 'i'){
-		
-		
-		var clientPlayerServerPos = this.translate(latest_server_data.pos);
-		
-		this.clientGhost.pos = this.pos(clientPlayerServerPos);
-		
-		
-		var last_input_sequence = latest_server_data.sequence;
-		
-			if(last_input_sequence){
-				var client_last_input_sequence_index = -1;
-				
-				for(var i = 0; i < this.clientPlayer.inputs.length; i++){
-					
-					if(this.clientPlayer.inputs[i].sequence === last_input_sequence){
-					
-						client_last_input_sequence_index = i;
-						break;
-					}
-				}
-				
-				
-				if(client_last_input_sequence_index != -1){
-					
-					 //so we have now gotten an acknowledgement from the server that our inputs here have been accepted
-	                //and that we can predict from this known position instead
-
-	                    //remove the rest of the inputs we have confirmed on the server
-	                var number_to_clear = Math.abs(client_last_input_sequence_index - (-1));
-					this.clientPlayer.inputs.splice(0,number_to_clear);
-					//if(this.do_net_correction){
-						this.clientPlayer.cur_pos_state = this.translate(latest_server_data.pos);
-						
-						this.update_physics();
-						this.update_local_position();
-					//}
-					
-					
-				}
-				
-			}
-	/*
-	}else{
-		jQuery('.net_correction_val').html('snap');
-		this.clientGhost.pos = this.pos(latest_server_data.pos);
-		//input source comes from the game rules
-		//snap the position
-		this.clientPlayer.cur_pos_state = this.translate(latest_server_data.pos);
-		
-		//this.update_physics();
-		this.update_local_position();
-		
-	}
-	*/
+				dataType:'JSON'
+				});*/
 	
 	
 };
+
+
 
 
 client_engine.prototype.refresh_ping = function(){
@@ -1023,184 +860,6 @@ client_engine.prototype.refresh_ping = function(){
 	
 };
 
-client_engine.prototype.update_snapshot = function(data){
-	
-	//open poll_valve
-	this.poll_valve = true;
-	//work out latency
-	this.recieved_update_time = new Date().getTime();
-	this.refresh_ping();
-	
-	
-	
-	
-	this.snapshot_value_string = data.snapShot;
-	//get the plane for this client
-	var snapShot = jQuery.parseJSON(this.snapshot_value_string);
-	
-	if(this.first_connection){
-		this.first_connection = false;
-		this.local_time = snapShot.time;
-	}
-	
-	 //Store the server time (this is offset by the latency in the network, by the time we get it)
-	this.server_time = snapShot.time;
-	
-    //Update our local offset time from the last server update
-    this.client_time = this.server_time - (this.net_offset/1000);
-	
-    var clientUpdate = {time:0};
-	
-
-	
-	//extract client plane
-	
-	var clientPlane = this.extract_client_plane(snapShot);
-	
-	clientUpdate = this.process_snapshot(clientPlane,this.clientPlayer.id); //get client updates from snapshot
-	this.gravity = clientPlane.gravity;
-	
-	clientUpdate.time = snapShot.time;
-	
-	//find new players
-	for(var cKey in clientPlane.characters){
-		
-		var anotherPlayer = clientPlane.characters[cKey];
-		if(anotherPlayer.playerID != this.clientPlayer.id){
-			var addPlayer = true;
-			
-			for(var oKey in this.players){
-				var inPlayer = this.players[oKey];
-				if(inPlayer.id === anotherPlayer.playerID){
-					//player already exists
-					//push as an update and don't create
-					//an object anymore
-					var otherUpdate = {time:0};
-					otherUpdate = anotherPlayer;
-					otherUpdate.time = snapShot.time;
-					inPlayer.player_server_updates.push(otherUpdate);
-					if(inPlayer.player_server_updates.length >= (60*this.buffer_size)){
-						inPlayer.player_server_updates.splice(0,1);
-					}
-					addPlayer = false;
-					break;
-				}
-			}
-			
-			if(addPlayer){
-				var playerObj = new game_player(this.translate(anotherPlayer.pos),anotherPlayer.speed,anotherPlayer.playerID,'no-state',false
-								,this.clientPlayer.planeID,anotherPlayer.sequence);
-				this.players.push(playerObj);
-			}
-		}
-		
-		
-	}
-	
-	this.server_updates.push(clientUpdate);
-	
-	 //we limit the buffer in seconds worth of updates
-    //60fps*buffer seconds = number of samples
-	if(this.server_updates.length >= ( 60*this.buffer_size )) {
-		this.server_updates.splice(0,1);
-	}
-	
-	
-	
-	this.oldest_tick = this.server_updates[0].time;
-	this.net_update_correction();
-	
-};
-
-client_engine.prototype.process_snapshot= function(clientPlane,playerID){
-	
-	var clientUpdate = {};
-	for(var charKey in clientPlane.characters){
-		if(clientPlane.characters[charKey].playerID === playerID){
-			return clientPlane.characters[charKey];
-		}
-	}
-	
-};
-
-client_engine.prototype.extract_client_plane = function(snapShot){
-	
-	var planes = snapShot.planes;
-	var clientPlane = {};
-	for(var key in planes){
-		if(planes[key].planeID === this.clientPlayer.planeID){
-			return planes[key];
-		
-		}
-	}
-	
-};
-
-
-client_engine.prototype.entity_interpolation = function(){
-	//no server updates for other players
-	for(var oKey in this.players){
-		var otherPlayer = this.players[oKey];
-		
-		if(!otherPlayer.player_server_updates.length) continue;
-		
-			
-		var current_time = this.client_time;
-		var count = otherPlayer.player_server_updates.length-1;
-		var target = null;
-		var previous = null;
-		
-		for(var i = 0; i < count; ++i){
-			var point = otherPlayer.player_server_updates[i];
-			var next_point = otherPlayer.player_server_updates[i+1];
-			
-			if(current_time > point.time && current_time < next_point.time){
-				target = next_point;
-				previous = point;
-				break;
-			}
-		}
-		
-		if(!target){
-			target = otherPlayer.player_server_updates[0];
-	        previous = otherPlayer.player_server_updates[0];
-		}
-		
-		if(target && previous){
-			
-			this.target_time = target.time;
-			
-			var difference = this.target_time - this.current_time;
-			var max_difference = (target.time - previous.time).fixed(3);
-			var time_point = (difference/max_difference).fixed(3);
-			
-			//for dividing by zero
-			if( isNaN(time_point) ) time_point = 0;
-		    if(time_point == -Infinity) time_point = 0;
-		    if(time_point == Infinity) time_point = 0;
-		    //The most recent server update
-		    var latest_server_data = otherPlayer.player_server_updates[count];
-			
-		    var latest_server_pos_data = this.translate(latest_server_data.pos);
-			
-		   // otherPlayer.ghostDebugger.pos = this.pos(latest_server_pos_data);
-		    
-		    //for client_smoothing
-		    var smoothed_pos = this.v_lerp(otherPlayer.pos, this.pos(latest_server_pos_data), this._pdt*this.client_smooth);
-		    /*
-		    if(!this.isEqual(smoothed_pos,otherPlayer.pos)){
-		    	otherPlayer.state = 'moving-state';
-		    }else{
-		    	otherPlayer.state = 'no-state';
-		    }
-		    */
-		    otherPlayer.pos = smoothed_pos;
-		}
-	}
-	
-	
-	
-};
 
 
 Number.prototype.fixed = function(n) { n = n || 3; return parseFloat(this.toFixed(n)); };
@@ -1367,42 +1026,6 @@ client_engine.prototype.checkFriction= function(object,force){
 
 
 
-//bounds to the floor below
-client_engine.prototype.checkBounds = function(object,force){
-
-	var objFeet = object.cur_pos_state.y + object.height;
-	object.feet_sensor = false;
-	//ground
-	if(objFeet > this.plane.height){
-		
-		object.velocity.y *= object.cof_rest; 
-		
-		object.cur_pos_state.y = this.plane.height - object.height;
-		
-		object.feet_sensor = true;
-	}
-	//left-bounds
-	if(object.cur_pos_state.x < 0){
-		object.velocity.x *= 1.0;
-		object.cur_pos_state.x = 0;
-	}
-	
-	var objWidth = object.cur_pos_state.x + object.width;
-	
-	if(objWidth > this.plane.width){
-		object.velocity.x *= 1.0;
-		object.cur_pos_state.x = this.plane.width - object.width;
-	}
-	
-	
-	
-	//reduce velocity x(temporary solution)
-	//var cof = 0.03;
-	//object.velocity.x *=cof;
-
-};
-
-
 client_engine.prototype.mouseLookup = function(e){
 	//get event from param or the window.event
 	var evt = e ? e : window.event;
@@ -1412,14 +1035,6 @@ client_engine.prototype.mouseLookup = function(e){
 			};
 	
 	
-};
-
-
-//Vector class
-var V = function(x,y,z){
-	this.x = x;
-	this.y = y;
-	this.z = z;
 };
 
 
